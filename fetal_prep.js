@@ -17,6 +17,7 @@ let complete;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  canvas.style("visibility", "visible");
   wW = windowWidth;
   wH = windowHeight;
   complete = loadSound('complete.mp3');
