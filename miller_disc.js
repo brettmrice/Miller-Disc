@@ -402,7 +402,7 @@ function clickBeginDisplay() {
   // large square
   stroke(cellColor_methodP);
   fill(cellColor_methodP);
-  sizeFactor = min(wW*0.75, wH*0.75);
+  sizeFactor = min(wW*0.75, wH*0.75*0.75);
   rect(wW/2 - sizeFactor/2,
        (wH*0.75 - sizeFactor)/2,
        sizeFactor, sizeFactor);
