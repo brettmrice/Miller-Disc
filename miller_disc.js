@@ -368,6 +368,26 @@ function touchStarted() {
   console.log('touching');
   clickBegin = 1;
   device = 'touch';
+  if(mouseX > resetArea[0] & mouseY > resetArea[1] &
+      mouseX < resetArea[2] & mouseY < resetArea[3]) {
+      resetCount();
+    }
+    if(mouseX > deleteArea[0] & mouseY > deleteArea[1] &
+      mouseX < deleteArea[2] & mouseY < deleteArea[3]) {
+      deleteCount();
+    }
+    if(mouseX > switchArea[0] & mouseY > switchArea[1] &
+      mouseX < switchArea[2] & mouseY < switchArea[3]) {
+      switchMethod();
+    }
+    if(mouseX > positiveArea[0] & mouseY > positiveArea[1] &
+      mouseX < positiveArea[2] & mouseY < positiveArea[3]) {
+      positiveCount();
+    }
+    if(mouseX > negativeArea[0] & mouseY > negativeArea[1] &
+      mouseX < negativeArea[2] & mouseY < negativeArea[3]) {
+      negativeCount();
+    }
   updateUI();
 }
 
