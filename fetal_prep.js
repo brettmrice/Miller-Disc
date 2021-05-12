@@ -16,8 +16,8 @@ let methodTrack = 1; // track method used (FP, MR, MD)
 let complete;
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
-  canvas.style("visibility", "visible");
+  mdCanvas = createCanvas(windowWidth, windowHeight);
+  mdCanvas.style("visibility", "visible");
   wW = windowWidth;
   wH = windowHeight;
   complete = loadSound('complete.mp3');
