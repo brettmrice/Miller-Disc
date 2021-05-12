@@ -13,14 +13,15 @@ let RBCs_P = 0; // fetal/postive RBCs
 let P_to_N = 0; // percent positive
 let countReset = "N";
 let methodTrack = 1; // track method used (FP, MR, MD)
-let complete;
+let clickBegin = 0;
+let completeSound;
+
 
 function setup() {
-  mdCanvas = createCanvas(windowWidth, windowHeight);
-  mdCanvas.style("visibility", "visible");
+  createCanvas(windowWidth, windowHeight);
   wW = windowWidth;
   wH = windowHeight;
-  complete = loadSound('complete.mp3');
+  completeSound = loadSound('complete.mp3');
 
   // arrays for positions
   for (let x = 0; x < 10; x++) {
@@ -38,7 +39,8 @@ function setup() {
   cellDiffColor[cellCounter] = 255;
 
   P_to_N_display = "Fetal Prep";
-  numCells_display = 'Begin Counting...';
+  //numCells_display = 'Begin Counting...';
+  numCells_display = '';
   textScale = 1;
   textAlign(CENTER, CENTER)
 }
@@ -47,14 +49,148 @@ function draw() {
   background(255);
   updateMethod(methodTrack);
   updateTextScale();
-  textAlign(CENTER, CENTER);
-  fill(0);
-  text(P_to_N_display, wW/2, wH*0.25/2);
-  translate(xStart, yStart);
-  stroke(0);
-  line(0, -1, wW, -1);
-  noStroke();
 
+  // procedure title
+  fill(0);
+  //stroke(0);
+  strokeWeight(1);
+  text(P_to_N_display, wW/2, wH*0.25/2);
+  textSize(wH*0.05*textScale);
+  text(numCells_display, wW/2, wH*0.2);
+  
+  translate(xStart, yStart);
+  //sizeFactor = min(xSize, ySize);
+  fill(0);
+  stroke(1);
+  line(0, -1, wW, -1);
+  translate(-xStart, -yStart);
+
+  // first view when open
+  if(clickBegin === 0) {
+    clickBeginDisplay();
+  } else {
+    updateUI();
+    //displayCount();
+  }
+  if(numCells > 0) {
+    displayCount(DisplayCountHeight);
+  }
+  
+  // complete signal = green border and audio
+  if(numCells >= 112) {
+    noFill();
+    stroke('rgb(0,255,0)');
+    strokeWeight(50);
+    rect(0, 0, wW, wH);
+    noStroke();
+    strokeWeight(1);
+    //completeSound.play();
+  } else {
+    // black border
+    noFill();
+    stroke(0);
+    strokeWeight(30);
+    rect(0, 0, wW, wH);
+    noStroke();
+    strokeWeight(1);
+  }
+  
+  //noLoop();
+}
+
+function keyTyped() {
+  // 2 = negative
+  if (key === '2') {
+    negativeCount();
+  }
+  // 3 = positive
+  if (key === '3') {
+    positiveCount();
+  }
+  // delete previous entry
+  if (key === 'D' | key === 'd') {
+    deleteCount()
+  }
+  // reset count
+  if (key === 'r' | key === 'R' |
+      (countReset === 'Y' & numCells === 0)) {
+    resetCount();
+  }
+  // switch procedure - FP to MR to MD
+  if (key === 's' | key === 'S') {
+    switchMethod();
+  }
+  
+  // uncomment to prevent any default behavior
+  // return false;
+  loop();
+}
+
+function resetCount() {
+  cellDiffID = [];
+  cellDiffColor = [];
+  RBCs_N = 0;
+  RBCs_P = 0;
+  numCells = cellDiffID.length;
+  P_to_N_display = P_to_N_display_methodBegin;
+  numCells_display = 'Begin Counting...';
+}
+
+function deleteCount() {
+  if(numCells > 0) {
+    if(cellDiffID.pop() === "N") {
+      RBCs_N -= 1;
+    } else {
+      RBCs_P -= 1;
+    }
+    cellDiffColor.pop();
+    numCells = cellDiffID.length;
+    countReset = "Y";
+  }
+  updateProgress();
+}
+
+function switchMethod() {
+  if(methodTrack === 3) {
+      methodTrack = 1;
+    } else {
+      methodTrack += 1;
+    }
+  updateMethod();
+}
+
+function negativeCount() {
+  cellColor = cellColor_methodN; //'rgb(255,182,193)';
+  cell = "N";
+  RBCs_N += 1;
+  updateCounter(cellColor, cell);
+  updateProgress();
+}
+
+function positiveCount() {
+  cellColor = cellColor_methodP; //'rgb(216, 0, 0)';
+  cell = "P";
+  RBCs_P += 1;
+  updateCounter(cellColor, cell);
+  updateProgress();
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  wW = windowWidth;
+  wH = windowHeight;
+  yStart  = wH*0.25;
+  xSize = floor((wW)/10);
+  ySize = floor((wH*0.5)/12);
+  textWidthTarget = (wW - 60) * 0.8;
+}
+
+function displayCount(f_displayCountHeight) {
+  translate(xStart, yStart);
+  ySize_backup = ySize;
+  ySize = f_displayCountHeight;
+  
+  noStroke();
   cellCounter = 0;
   for(rowCount = 0; rowCount < 12; rowCount++) {
     for(colCount = 0; colCount < 10; colCount++) {
@@ -62,7 +198,6 @@ function draw() {
         fill(cellDiffColor[cellCounter]);
       } else {
         fill(255);
-        noStroke();
       }
       rect(xSize * colCount,
            ySize * rowCount,
@@ -79,118 +214,8 @@ function draw() {
       cellCounter++;
     }
   }
-  if(numCells === 0) {
-    fill(0);
-    textSize(wH*0.05*textScale);
-    instructions(defineNegative, wH*0.1/2);
-    instructions(definePositive, wH*0.3/2);
-    noFill();
-    strokeWeight(2);
-    stroke(cellColor_methodP);
-    fill(cellColor_methodP);
-    sizeFactor = min(xSize, ySize);
-    rect(wW/2 - sizeFactor*3, wH*0.4/2,
-         sizeFactor*6, sizeFactor*6);
-    stroke(cellColor_methodN);
-    fill(cellColor_methodN);
-    rect(wW/2 - sizeFactor*3 + sizeFactor*6*2/3,
-         wH*0.4/2 + sizeFactor*6*2/3,
-         sizeFactor*6*1/3, sizeFactor*6*1/3);
-    strokeWeight(1);
-  }
-  stroke(0);
-  line(0, (ySize*12)+1, wW, (ySize*12)+1);
-  noStroke();
-
-  fill(0);
-  textSize(wH*0.07*textScale);
-  text(numCells_display, wW/2, wH*0.6);
-  textSize(wH*0.04*textScale);
-  text('"R"=Reset     "D"=Delete     "S"= Switch', wW/2, wH*0.68);
-
   translate(-xStart, -yStart);
-  if(numCells >= 112) {
-    noFill();
-    stroke('rgb(0,255,0)');
-    strokeWeight(30);
-    rect(0, 0, wW, wH);
-    noStroke();
-    strokeWeight(1);
-    complete.play();
-  } else {
-    noFill();
-    stroke(0);
-    strokeWeight(30);
-    rect(0, 0, wW, wH);
-    noStroke();
-    strokeWeight(1);
-  }
-  noLoop();
-}
-
-function keyTyped() {
-  if (key === '2') {
-    cellColor = cellColor_methodN; //'rgb(255,182,193)';
-    cell = "N";
-    RBCs_N += 1;
-    updateCounter(cellColor, cell);
-    updateProgress();
-  } else if (key === '3') {
-    cellColor = cellColor_methodP; //'rgb(216, 0, 0)';
-    cell = "P";
-    RBCs_P += 1;
-    updateCounter(cellColor, cell);
-    updateProgress();
-  }
-
-  if (key === 'D' | key === 'd') {
-    if(numCells > 0) {
-      if(cellDiffID.pop() === "N") {
-        RBCs_N -= 1;
-      } else {
-        RBCs_P -= 1;
-      }
-      cellDiffColor.pop();
-      numCells = cellDiffID.length;
-      countReset = "Y";
-    }
-    updateProgress();
-  }
-
-  if (key === 'r' | key === 'R' |
-      (countReset === 'Y' & numCells === 0)) {
-    cellDiffID = [];
-    cellDiffColor = [];
-    RBCs_N = 0;
-    RBCs_P = 0;
-    numCells = cellDiffID.length;
-    P_to_N_display = P_to_N_display_methodBegin;
-    numCells_display = 'Begin Counting...';
-  }
-
-  if (key === 's' | key === 'S') {
-    if(methodTrack === 3) {
-      methodTrack = 1;
-    } else {
-      methodTrack += 1;
-    }
-    updateMethod();
-    //switchMethod();
-  }
-
-  // uncomment to prevent any default behavior
-  // return false;
-  loop();
-}
-
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-  wW = windowWidth;
-  wH = windowHeight;
-  yStart  = wH*0.25;
-  xSize = floor((wW)/10);
-  ySize = floor((wH*0.5)/12);
-  textWidthTarget = (wW - 60) * 0.8;
+  ySize = ySize_backup;
 }
 
 function updateCounter(color, cell, update = 0) {
@@ -210,7 +235,6 @@ function updateCounter(color, cell, update = 0) {
     } else {
       RBCs_P -= 1;
     }
-
   }
 }
 
@@ -256,6 +280,7 @@ function updateMethod(methodTrack) {
     definePositive = ['Use "3" for', 'Positive',
                       'Particle', cellColor_methodP];
   }
+  // update already started count to new selected procedure
   if(numCells > 0) {
     for(s = 0; s < numCells; s++) {
       if(cellDiffID[s] === "P") {
@@ -270,15 +295,24 @@ function updateMethod(methodTrack) {
   }
 }
 
+// display percent, total counted, and complete signal
 function updateProgress() {
-  P_to_N = round(RBCs_P/(RBCs_N*9)*100, 1);
-  P_to_N_display = P_to_N_display_method + P_to_N.toFixed(1) + "%";
+  // update percent present
+  if(RBCs_N === 0) {
+    P_to_N = round(RBCs_P/(RBCs_N*9)*100, 1);
+    P_to_N_display = P_to_N_display_method + "100%";
+  } else {
+    P_to_N = round(RBCs_P/(RBCs_N*9)*100, 1);
+    P_to_N_display = P_to_N_display_method + P_to_N.toFixed(1) + "%";
+  }
   numCells_display = "Cells Counted = " + numCells;
 }
 
+// display instructions at beginning
 function instructions(defineInstructions, textHeight) {
   dI = subset(defineInstructions, 0, 3);
   dIfill = defineInstructions[3];
+  noStroke();
   fill(0);
   textSize(wH*0.05*textScale);
   t1 = subset(dI, 0, 1);
@@ -292,10 +326,200 @@ function instructions(defineInstructions, textHeight) {
   text(dI[0], textStart, textHeight);
   fill(dIfill);
   stroke(dIfill);
-  strokeWeight(2);
+  strokeWeight(1.5);
   text(" " + dI[1], textStart + tW1, textHeight);
   fill(0);
-  strokeWeight(1);
+  noStroke();
+  //strokeWeight(1);
   text(" " + dI[2], textStart + tW2, textHeight);
   textAlign(CENTER, CENTER);
 }
+
+function mouseClicked() {
+  if(clickBegin === 0) {
+    clickBegin = 1;
+    device = 'mouse';
+    updateUI();
+  } else if(device === 'touch') {
+    if(mouseX > resetArea[0] & mouseY > resetArea[1] &
+      mouseX < resetArea[2] & mouseY < resetArea[3]) {
+      resetCount();
+    }
+    if(mouseX > deleteArea[0] & mouseY > deleteArea[1] &
+      mouseX < deleteArea[2] & mouseY < deleteArea[3]) {
+      deleteCount();
+    }
+    if(mouseX > switchArea[0] & mouseY > switchArea[1] &
+      mouseX < switchArea[2] & mouseY < switchArea[3]) {
+      switchMethod();
+    }
+    if(mouseX > positiveArea[0] & mouseY > positiveArea[1] &
+      mouseX < positiveArea[2] & mouseY < positiveArea[3]) {
+      positiveCount();
+    }
+    if(mouseX > negativeArea[0] & mouseY > negativeArea[1] &
+      mouseX < negativeArea[2] & mouseY < negativeArea[3]) {
+      negativeCount();
+    }
+  }
+}
+
+function touchStarted() {
+  console.log('touching');
+  clickBegin = 1;
+  device = 'touch';
+  updateUI();
+}
+
+function updateUI() {
+  //background(50, 50);
+  if(device === 'mouse') {
+    mouseEnvironment();
+    DisplayCountHeight = (ySize*14)/12;
+  } else if(device === 'touch') {
+    touchEnvironment();
+    DisplayCountHeight = floor((wH*0.5)/12);
+  }
+  numCells_display = 'Begin Counting...';
+  loop();
+}
+
+// large miller disc at startup
+function clickBeginDisplay() {
+  /*translate(xStart, yStart);
+  sizeFactor = min(xSize, ySize);
+  fill(0);
+  line(0, -1, wW, -1);
+  line(0, (ySize*12)+1, wW, (ySize*12)+1);
+  translate(-xStart, -yStart);
+  */
+
+  translate(xStart, yStart);
+  strokeWeight(2);
+  // blank sqaure
+  //fill(255);
+  //rect(0, 0, wW, wH);
+  // large square
+  stroke(cellColor_methodP);
+  fill(cellColor_methodP);
+  sizeFactor = min(wW*0.75, wH*0.75);
+  rect(wW/2 - sizeFactor/2,
+       (wH*0.75 - sizeFactor)/2,
+       sizeFactor, sizeFactor);
+  // small square
+  stroke(cellColor_methodN);
+  fill(cellColor_methodN);
+  rect((wW/2 - sizeFactor/2) + sizeFactor*2/3,
+       ((wH*0.75 - sizeFactor)/2) + sizeFactor*2/3,
+       sizeFactor*1/3, sizeFactor*1/3);
+  noStroke();
+  fill(255);
+  textSize(sizeFactor*0.15*textScale);
+  beginTextHeight = (wH*0.75 - sizeFactor)/2 + (((wH*0.75 - sizeFactor)/2) + sizeFactor*2/3)/2;
+  text('Click to Begin', wW/2, beginTextHeight);//wH*0.75/2);
+  translate(-xStart, -yStart);
+  
+  // black border
+  noFill();
+  stroke(0);
+  strokeWeight(30);
+  rect(0, 0, wW, wH);
+  noStroke();
+  strokeWeight(1);
+}
+
+function mouseEnvironment() {
+  translate(xStart, yStart);
+  stroke(1);
+  line(0, (ySize*14)+1, wW, (ySize*14)+1);
+  
+  // display instructions
+  if(numCells === 0) {
+    fill(0);
+    textSize(wH*0.05*textScale);
+    instructions(defineNegative, wH*0.12/2);
+    instructions(definePositive, wH*0.27/2);
+    noFill();
+    strokeWeight(2);
+    stroke(cellColor_methodP);
+    fill(cellColor_methodP);
+    sizeFactor = min(xSize, ySize);
+    rect(wW/2 - sizeFactor*4, wH*0.4/2,
+         sizeFactor*8, sizeFactor*8);
+    stroke(cellColor_methodN);
+    fill(cellColor_methodN);
+    rect(wW/2 - sizeFactor*4 + sizeFactor*8*2/3,
+         wH*0.4/2 + sizeFactor*8*2/3,
+         sizeFactor*8*1/3, sizeFactor*8*1/3);
+    strokeWeight(1);
+  }
+  translate(-xStart, -yStart);
+
+  fill(0);
+  noStroke();
+  textSize(wH*0.04*textScale);
+  text('"R"eset       "D"elete       "S"witch', wW/2, wH*0.9);
+}
+
+function touchEnvironment() {
+  translate(xStart, yStart);
+  stroke(0);
+  strokeWeight(5);
+  heightLeft = wH - (yStart + (ySize*12)+1);
+  translate(xStart, (ySize*12)+1);
+  fill(255);
+  rect(0, 0, wW, heightLeft);
+  // button locations
+  fill(200);
+  // reset
+  // areas = [top left x, top left y, bottom right x, bottom right y]
+  resetArea = [xStart + 0, yStart + (ySize*12)+1 + 0,
+               xStart + wW*1/3, yStart + (ySize*12)+1 + heightLeft*1/3];
+  rect(0, 0, wW*1/3, heightLeft*1/3);
+  fill(150);
+  // delete
+  deleteArea = [xStart + wW*1/3, yStart + (ySize*12)+1 + 0,
+                xStart + wW*2/3,
+                yStart + (ySize*12)+1 + heightLeft*1/3];
+  rect(wW*1/3, 0, wW*1/3, heightLeft*1/3);
+  fill(200);
+  // switch
+  switchArea = [xStart + wW*2/3, yStart + (ySize*12)+1 + 0,
+                xStart + wW*2/3 + wW*1/3,
+                yStart + (ySize*12)+1 + heightLeft*1/3];
+  rect(wW*2/3, 0, wW*1/3, heightLeft*1/3);
+  fill(cellColor_methodP);
+  // positive
+  positiveArea = [xStart + 0, yStart + (ySize*12)+1 + heightLeft*1/3,
+                xStart + wW*1/2,
+                yStart + (ySize*12)+1 + heightLeft];
+  rect(0, heightLeft*1/3, wW*1/2, heightLeft);
+  fill(cellColor_methodN);
+  // negative
+  negativeArea = [xStart + wW*1/2, yStart + (ySize*12)+1 + heightLeft*1/3,
+                xStart + wW*1/2 + wW*1/2,
+                yStart + (ySize*12)+1 + heightLeft];
+  rect(wW*1/2, heightLeft*1/3, wW*1/2, heightLeft);
+  // text descriptions
+  translate(wW*1/3*1/2, heightLeft*1/3*1/2);
+  noStroke();
+  fill(255);
+  textSize(wH*0.07*textScale);
+  text('Reset', 0, 0);
+  text('Delete', wW*1/3, 0);
+  text('Switch', wW*2/3, 0);
+  translate(-wW*1/3*1/2, -heightLeft*1/3*1/2);
+  translate(wW*1/4, (heightLeft*2/3));
+  fill(255, 50);
+  text('Positive', 0, 0);
+  text('Negative', wW*1/2, 0);
+  translate(-wW*1/4, -(heightLeft*2/3));
+  strokeWeight(1);
+  noStroke();
+  translate(-xStart, -((ySize*12)+1));
+  stroke(1);
+  line(0, (ySize*12)+1, wW, (ySize*12)+1);
+  translate(-xStart, -yStart);
+  noStroke();
+}
+
