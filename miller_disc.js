@@ -95,7 +95,7 @@ function draw() {
     strokeWeight(1);
   }
   
-  //noLoop();
+  noLoop();
 }
 
 function keyTyped() {
