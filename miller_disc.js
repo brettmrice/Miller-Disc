@@ -348,9 +348,11 @@ function mouseClicked() {
 
 function touchStarted() {
   console.log('touching');
-  clickBegin = 1;
-  device = 'touch';
-  if(mouseX > resetArea[0] & mouseY > resetArea[1] &
+  if(clickBegin === 1) {
+    clickBegin = 1;
+    device = 'touch';
+  } else {
+    if(mouseX > resetArea[0] & mouseY > resetArea[1] &
       mouseX < resetArea[2] & mouseY < resetArea[3]) {
       resetCount();
     }
@@ -370,6 +372,7 @@ function touchStarted() {
       mouseX < negativeArea[2] & mouseY < negativeArea[3]) {
       negativeCount();
     }
+  }
   updateUI();
 }
 
