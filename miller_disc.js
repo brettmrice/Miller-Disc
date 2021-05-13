@@ -84,7 +84,7 @@ function draw() {
     rect(0, 0, wW, wH);
     noStroke();
     strokeWeight(1);
-    //completeSound.play();
+    completeSound.play();
   } else {
     // black border
     noFill();
