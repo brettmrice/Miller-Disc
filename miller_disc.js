@@ -16,13 +16,16 @@ let methodTrack = 1; // track method used (FP, MR, MD)
 let clickBegin = 0;
 let completeSound;
 
+/*function preload() {
+  completeSound = loadSound('complete.mp3');
+}*/
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   wW = windowWidth;
   wH = windowHeight;
   completeSound = loadSound('complete.mp3');
-
+  
   // arrays for positions
   for (let x = 0; x < 10; x++) {
     xPos[x] = x;
@@ -183,6 +186,7 @@ function windowResized() {
   xSize = floor((wW)/10);
   ySize = floor((wH*0.5)/12);
   textWidthTarget = (wW - 60) * 0.8;
+  loop();
 }
 
 function displayCount(f_displayCountHeight) {
@@ -341,6 +345,7 @@ function mouseClicked() {
     device = 'mouse';
     updateUI();
   }
+  loop();
 }
 
 function touchStarted() {
@@ -368,6 +373,7 @@ function touchStarted() {
       negativeCount();
     }
   updateUI();
+  loop();
 }
 
 function updateUI() {
