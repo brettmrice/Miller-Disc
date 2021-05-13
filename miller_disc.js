@@ -186,7 +186,6 @@ function windowResized() {
   xSize = floor((wW)/10);
   ySize = floor((wH*0.5)/12);
   textWidthTarget = (wW - 60) * 0.8;
-  loop();
 }
 
 function displayCount(f_displayCountHeight) {
@@ -345,7 +344,6 @@ function mouseClicked() {
     device = 'mouse';
     updateUI();
   }
-  loop();
 }
 
 function touchStarted() {
@@ -373,7 +371,6 @@ function touchStarted() {
       negativeCount();
     }
   updateUI();
-  loop();
 }
 
 function updateUI() {
@@ -386,7 +383,6 @@ function updateUI() {
     DisplayCountHeight = floor((wH*0.5)/12);
   }
   numCells_display = 'Begin Counting...';
-  loop();
 }
 
 // large miller disc at startup
