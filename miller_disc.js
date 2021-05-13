@@ -383,6 +383,7 @@ function updateUI() {
     DisplayCountHeight = floor((wH*0.5)/12);
   }
   numCells_display = 'Begin Counting...';
+  loop();
 }
 
 // large miller disc at startup
