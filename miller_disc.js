@@ -15,6 +15,7 @@ let countReset = "N";
 let methodTrack = 1; // track method used (FP, MR, MD)
 let clickBegin = 0;
 let completeSound;
+let buttonResizeFactor = 1;
 
 /*function preload() {
   completeSound = loadSound('complete.mp3');
@@ -80,23 +81,7 @@ function draw() {
   }
 
   // complete signal = green border and audio
-  if(numCells >= 112) {
-    noFill();
-    stroke('rgb(0,255,0)');
-    strokeWeight(50);
-    rect(0, 0, wW, wH);
-    noStroke();
-    strokeWeight(1);
-    //completeSound.play();
-  } else {
-    // black border
-    noFill();
-    stroke(0);
-    strokeWeight(30);
-    rect(0, 0, wW, wH);
-    noStroke();
-    strokeWeight(1);
-  }
+  drawBorder();
 
   noLoop();
 }
@@ -342,6 +327,32 @@ function mouseClicked() {
   if(clickBegin === 0) {
     clickBegin = 1;
     device = 'mouse';
+    device = 'touch';
+  } else {
+    if(mouseX > resetArea[0] & mouseY > resetArea[1] &
+        mouseX < resetArea[2] & mouseY < resetArea[3]) {
+        resetCount();
+      }
+      if(mouseX > deleteArea[0] & mouseY > deleteArea[1] &
+        mouseX < deleteArea[2] & mouseY < deleteArea[3]) {
+        deleteCount();
+      }
+      if(mouseX > switchArea[0] & mouseY > switchArea[1] &
+        mouseX < switchArea[2] & mouseY < switchArea[3]) {
+        switchMethod();
+      }
+      if(mouseX > positiveArea[0] & mouseY > positiveArea[1] &
+        mouseX < positiveArea[2] & mouseY < positiveArea[3]) {
+        positiveCount();
+      }
+      if(mouseX > negativeArea[0] & mouseY > negativeArea[1] &
+        mouseX < negativeArea[2] & mouseY < negativeArea[3]) {
+        negativeCount();
+      }
+    if(mouseX > resizeArea[0] & mouseY > resizeArea[1] &
+        mouseX < resizeArea[2] & mouseY < resizeArea[3]) {
+       //resizeButtons();
+       }
   }
   updateUI();
 }
@@ -394,8 +405,10 @@ function updateUI() {
     mouseEnvironment();
     DisplayCountHeight = (ySize*14)/updateNumRows;
   } else if(device === 'touch') {
+    beginYReset = (ySize*12)*buttonResizeFactor;
+    beginYResize = beginYReset - ySize;
     touchEnvironment();
-    DisplayCountHeight = (ySize*12)/updateNumRows;
+    DisplayCountHeight = beginYResize/updateNumRows;//(ySize*11)/updateNumRows;
   }
   numCells_display = 'Begin Counting...';
   loop();
@@ -437,7 +450,7 @@ function clickBeginDisplay() {
 function mouseEnvironment() {
   translate(xStart, yStart);
   stroke(1);
-  line(0, (ySize*14)+1, wW, (ySize*14)+1);
+  line(0, (ySize*14), wW, (ySize*14));
 
   // display instructions
   if(numCells === 0) {
@@ -468,43 +481,45 @@ function mouseEnvironment() {
 }
 
 function touchEnvironment() {
+  heightLeft = wH - (yStart + beginYReset);
+  
+  // control area
   translate(xStart, yStart);
   stroke(0);
   strokeWeight(5);
-  heightLeft = wH - (yStart + (ySize*12)+1);
-  translate(xStart, (ySize*12)+1);
+  translate(xStart, beginYReset);
   fill(255);
   rect(0, 0, wW, heightLeft);
   // button locations
   fill(200);
   // reset
   // areas = [top left x, top left y, bottom right x, bottom right y]
-  resetArea = [xStart + 0, yStart + (ySize*12)+1 + 0,
-               xStart + wW*1/3, yStart + (ySize*12)+1 + heightLeft*1/3];
+  resetArea = [xStart + 0, yStart + beginYReset,
+               xStart + wW*1/3, yStart + beginYReset + heightLeft*1/3];
   rect(0, 0, wW*1/3, heightLeft*1/3);
   fill(150);
   // delete
-  deleteArea = [xStart + wW*1/3, yStart + (ySize*12)+1 + 0,
+  deleteArea = [xStart + wW*1/3, yStart + beginYReset,
                 xStart + wW*2/3,
-                yStart + (ySize*12)+1 + heightLeft*1/3];
+                yStart + beginYReset + heightLeft*1/3];
   rect(wW*1/3, 0, wW*1/3, heightLeft*1/3);
   fill(200);
   // switch
-  switchArea = [xStart + wW*2/3, yStart + (ySize*12)+1 + 0,
+  switchArea = [xStart + wW*2/3, yStart + beginYReset,
                 xStart + wW*2/3 + wW*1/3,
-                yStart + (ySize*12)+1 + heightLeft*1/3];
+                yStart + beginYReset + heightLeft*1/3];
   rect(wW*2/3, 0, wW*1/3, heightLeft*1/3);
   fill(cellColor_methodP);
   // positive
-  positiveArea = [xStart + 0, yStart + (ySize*12)+1 + heightLeft*1/3,
+  positiveArea = [xStart, yStart + beginYReset + heightLeft*1/3,
                 xStart + wW*1/2,
-                yStart + (ySize*12)+1 + heightLeft];
+                yStart + beginYReset + heightLeft];
   rect(0, heightLeft*1/3, wW*1/2, heightLeft);
   fill(cellColor_methodN);
   // negative
-  negativeArea = [xStart + wW*1/2, yStart + (ySize*12)+1 + heightLeft*1/3,
+  negativeArea = [xStart + wW*1/2, yStart + beginYReset + heightLeft*1/3,
                 xStart + wW*1/2 + wW*1/2,
-                yStart + (ySize*12)+1 + heightLeft];
+                yStart + beginYReset + heightLeft];
   rect(wW*1/2, heightLeft*1/3, wW*1/2, heightLeft);
   // text descriptions
   translate(wW*1/3*1/2, heightLeft*1/3*1/2);
@@ -522,9 +537,77 @@ function touchEnvironment() {
   translate(-wW*1/4, -(heightLeft*2/3));
   strokeWeight(1);
   noStroke();
-  translate(-xStart, -((ySize*12)+1));
+  translate(-xStart, -beginYReset);
   stroke(1);
-  line(0, (ySize*12)+1, wW, (ySize*12)+1);
+  line(0, beginYReset, wW, beginYReset);
   translate(-xStart, -yStart);
   noStroke();
+  
+  
+  // pull up resize button
+  translate(xStart, yStart + beginYResize);
+  //stroke(0, 50);
+  strokeWeight(5);
+  fill(0, 50);
+  // resize
+  resizeArea = [xStart, yStart + beginYResize,
+                xStart + wW,
+                yStart + beginYResize + ySize];
+  //fill(0);
+  //line(xStart, 0, wW, heightLeft*1/6);
+  rect(0, 0, wW, ySize);
+  textSize(wH*0.03*textScale);
+  noStroke();
+  fill(255, 150);
+  text(('^' + '\t\t\t').repeat(7) + 
+       '\t\t\t' + 
+       ('\t\t\t' + '^').repeat(7), 
+       wW*1/2, ySize*1/2.5);
+  text(('^' + '\t\t\t').repeat(7) + 
+       ('\t').repeat(7) + 
+       ('\t\t\t' + '^').repeat(7), 
+       wW*1/2, ySize*2/3);
+  text('Resize', wW*1/2, ySize*1/2);
+  noStroke();
+  translate(-xStart, -((yStart + beginYResize)));
+  drawBorder()
+}
+
+function mouseDragged() {
+  if(clickBegin > 0 & 
+     mouseX > resizeArea[0] & mouseY > resizeArea[1] &
+        mouseX < resizeArea[2] & mouseY < resizeArea[3]) {
+    //buttonResizeFactor = map(mouseY, 
+    //                         beginYReset*.8, beginYReset,
+    //                         0.8, 1);
+    adjustMax = wH * 2/3; //(resizeArea[3] - resizeArea[1]) * 3;
+    if(mouseY > pmouseY) {
+      buttonResizeFactor = min(1, buttonResizeFactor += 0.01);
+    } else {
+      buttonResizeFactor = max(0.7, buttonResizeFactor -= 0.01);
+    }
+    updateUI();
+    console.log('resize' + mouseY);
+  }
+  return false;
+}
+
+function drawBorder() {
+  if(numCells >= 112) {
+    noFill();
+    stroke('rgb(0,255,0)');
+    strokeWeight(50);
+    rect(0, 0, wW, wH);
+    noStroke();
+    strokeWeight(1);
+    //completeSound.play();
+  } else {
+    // black border
+    noFill();
+    stroke(0);
+    strokeWeight(30);
+    rect(0, 0, wW, wH);
+    noStroke();
+    strokeWeight(1);
+  }
 }
