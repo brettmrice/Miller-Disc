@@ -556,7 +556,7 @@ function touchEnvironment() {
   //fill(0);
   //line(xStart, 0, wW, heightLeft*1/6);
   rect(0, 0, wW, ySize);
-  textSize(wH*0.03*textScale);
+  textSize(wH*0.05*textScale);
   noStroke();
   fill(255, 150);
   text(('^' + '\t\t\t').repeat(7) + 
@@ -567,7 +567,7 @@ function touchEnvironment() {
        ('\t').repeat(7) + 
        ('\t\t\t' + '^').repeat(7), 
        wW*1/2, ySize*2/3);
-  text('Resize', wW*1/2, ySize*1/2);
+  text('Drag', wW*1/2, ySize*1/2);
   noStroke();
   translate(-xStart, -((yStart + beginYResize)));
   drawBorder()
