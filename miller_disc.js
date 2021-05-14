@@ -347,10 +347,10 @@ function mouseClicked() {
 }
 
 function touchStarted() {
-  var fs = fullscreen();
+  /*var fs = fullscreen();
     if (!fs) {
       fullscreen(true);
-    }
+    }*/
   console.log('touching');
   if(clickBegin === 0) {
     clickBegin = 1;
@@ -379,10 +379,10 @@ function touchStarted() {
   }
   updateUI();
 }
-
+/*
 document.ontouchmove = function(event) {
     event.preventDefault();
-};
+};*/
 
 function updateUI() {
   //background(50, 50);
