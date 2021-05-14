@@ -24,8 +24,8 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   wW = windowWidth;
   wH = windowHeight;
-  completeSound = loadSound('complete.mp3');
-  
+  //completeSound = loadSound('complete.mp3');
+
   // arrays for positions
   for (let x = 0; x < 10; x++) {
     xPos[x] = x;
@@ -60,7 +60,7 @@ function draw() {
   text(P_to_N_display, wW/2, wH*0.25/2);
   textSize(wH*0.05*textScale);
   text(numCells_display, wW/2, wH*0.2);
-  
+
   translate(xStart, yStart);
   //sizeFactor = min(xSize, ySize);
   fill(0);
@@ -78,7 +78,7 @@ function draw() {
   if(numCells > 0) {
     displayCount(DisplayCountHeight);
   }
-  
+
   // complete signal = green border and audio
   if(numCells >= 112) {
     noFill();
@@ -87,7 +87,7 @@ function draw() {
     rect(0, 0, wW, wH);
     noStroke();
     strokeWeight(1);
-    completeSound.play();
+    //completeSound.play();
   } else {
     // black border
     noFill();
@@ -97,7 +97,7 @@ function draw() {
     noStroke();
     strokeWeight(1);
   }
-  
+
   noLoop();
 }
 
@@ -123,7 +123,7 @@ function keyTyped() {
   if (key === 's' | key === 'S') {
     switchMethod();
   }
-  
+
   // uncomment to prevent any default behavior
   // return false;
   loop();
@@ -192,7 +192,7 @@ function displayCount(f_displayCountHeight) {
   translate(xStart, yStart);
   ySize_backup = ySize;
   ySize = f_displayCountHeight;
-  
+
   noStroke();
   cellCounter = 0;
   for(rowCount = 0; rowCount < 12; rowCount++) {
@@ -347,6 +347,11 @@ function mouseClicked() {
 }
 
 function touchStarted() {
+  var fs = fullscreen();
+    if (!fs) {
+      fullscreen(true);
+    }
+  console.log('touching');
   if(clickBegin === 0) {
     clickBegin = 1;
     device = 'touch';
@@ -375,6 +380,10 @@ function touchStarted() {
   updateUI();
 }
 
+document.ontouchmove = function(event) {
+    event.preventDefault();
+};
+
 function updateUI() {
   //background(50, 50);
   if(device === 'mouse') {
@@ -390,19 +399,8 @@ function updateUI() {
 
 // large miller disc at startup
 function clickBeginDisplay() {
-  /*translate(xStart, yStart);
-  sizeFactor = min(xSize, ySize);
-  fill(0);
-  line(0, -1, wW, -1);
-  line(0, (ySize*12)+1, wW, (ySize*12)+1);
-  translate(-xStart, -yStart);
-  */
-
   translate(xStart, yStart);
   strokeWeight(2);
-  // blank sqaure
-  //fill(255);
-  //rect(0, 0, wW, wH);
   // large square
   stroke(cellColor_methodP);
   fill(cellColor_methodP);
@@ -422,7 +420,7 @@ function clickBeginDisplay() {
   beginTextHeight = (wH*0.75 - sizeFactor)/2 + (((wH*0.75 - sizeFactor)/2) + sizeFactor*2/3)/2;
   text('Click to Begin', wW/2, beginTextHeight);//wH*0.75/2);
   translate(-xStart, -yStart);
-  
+
   // black border
   noFill();
   stroke(0);
@@ -436,7 +434,7 @@ function mouseEnvironment() {
   translate(xStart, yStart);
   stroke(1);
   line(0, (ySize*14)+1, wW, (ySize*14)+1);
-  
+
   // display instructions
   if(numCells === 0) {
     fill(0);
@@ -526,4 +524,3 @@ function touchEnvironment() {
   translate(-xStart, -yStart);
   noStroke();
 }
-
