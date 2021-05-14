@@ -379,6 +379,12 @@ function touchStarted() {
   }
   updateUI();
 }
+
+function touchMoved() {
+  // prevent default
+  return false;
+}
+
 /*
 document.ontouchmove = function(event) {
     event.preventDefault();
