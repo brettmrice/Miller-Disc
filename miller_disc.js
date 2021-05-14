@@ -16,9 +16,9 @@ let methodTrack = 1; // track method used (FP, MR, MD)
 let clickBegin = 0;
 let completeSound;
 
-function preload() {
+/*function preload() {
   completeSound = loadSound('complete.mp3');
-}
+}*/
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -80,13 +80,23 @@ function draw() {
   }
 
   // complete signal = green border and audio
-  // black border
-  noFill();
-  stroke(0);
-  strokeWeight(30);
-  rect(0, 0, wW, wH);
-  noStroke();
-  strokeWeight(1);
+  if(numCells >= 112) {
+    noFill();
+    stroke('rgb(0,255,0)');
+    strokeWeight(50);
+    rect(0, 0, wW, wH);
+    noStroke();
+    strokeWeight(1);
+    //completeSound.play();
+  } else {
+    // black border
+    noFill();
+    stroke(0);
+    strokeWeight(30);
+    rect(0, 0, wW, wH);
+    noStroke();
+    strokeWeight(1);
+  }
 
   noLoop();
 }
@@ -185,7 +195,7 @@ function displayCount(f_displayCountHeight) {
 
   noStroke();
   cellCounter = 0;
-  for(rowCount = 0; rowCount < 12; rowCount++) {
+  for(rowCount = 0; rowCount < updateNumRows; rowCount++) {
     for(colCount = 0; colCount < 10; colCount++) {
       if(cellCounter < numCells) {
         fill(cellDiffColor[cellCounter]);
@@ -299,15 +309,6 @@ function updateProgress() {
     P_to_N_display = P_to_N_display_method + P_to_N.toFixed(1) + "%";
   }
   numCells_display = "Cells Counted = " + numCells;
-  if(numCells >= 112) {
-    noFill();
-    stroke('rgb(0,255,0)');
-    strokeWeight(50);
-    rect(0, 0, wW, wH);
-    noStroke();
-    strokeWeight(1);
-    completeSound.play();
-  }
 }
 
 // display instructions at beginning
@@ -341,8 +342,8 @@ function mouseClicked() {
   if(clickBegin === 0) {
     clickBegin = 1;
     device = 'mouse';
-    updateUI();
   }
+  updateUI();
 }
 
 function touchStarted() {
@@ -378,25 +379,23 @@ function touchStarted() {
   }
   updateUI();
 }
-
-function touchMoved() {
-  // prevent default
-  return false;
-}
-
 /*
 document.ontouchmove = function(event) {
     event.preventDefault();
 };*/
 
 function updateUI() {
-  //background(50, 50);
+  if(numCells > 120) {
+      updateNumRows = ceil(numCells/10);
+    } else {
+      updateNumRows = 12;
+    }
   if(device === 'mouse') {
     mouseEnvironment();
-    DisplayCountHeight = (ySize*14)/12;
+    DisplayCountHeight = (ySize*14)/updateNumRows;
   } else if(device === 'touch') {
     touchEnvironment();
-    DisplayCountHeight = floor((wH*0.5)/12);
+    DisplayCountHeight = (ySize*12)/updateNumRows;
   }
   numCells_display = 'Begin Counting...';
   loop();
