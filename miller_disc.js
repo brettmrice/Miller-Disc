@@ -80,23 +80,13 @@ function draw() {
   }
 
   // complete signal = green border and audio
-  if(numCells >= 112) {
-    noFill();
-    stroke('rgb(0,255,0)');
-    strokeWeight(50);
-    rect(0, 0, wW, wH);
-    noStroke();
-    strokeWeight(1);
-    completeSound.play();
-  } else {
-    // black border
-    noFill();
-    stroke(0);
-    strokeWeight(30);
-    rect(0, 0, wW, wH);
-    noStroke();
-    strokeWeight(1);
-  }
+  // black border
+  noFill();
+  stroke(0);
+  strokeWeight(30);
+  rect(0, 0, wW, wH);
+  noStroke();
+  strokeWeight(1);
 
   noLoop();
 }
@@ -309,6 +299,15 @@ function updateProgress() {
     P_to_N_display = P_to_N_display_method + P_to_N.toFixed(1) + "%";
   }
   numCells_display = "Cells Counted = " + numCells;
+  if(numCells >= 112) {
+    noFill();
+    stroke('rgb(0,255,0)');
+    strokeWeight(50);
+    rect(0, 0, wW, wH);
+    noStroke();
+    strokeWeight(1);
+    completeSound.play();
+  }
 }
 
 // display instructions at beginning
