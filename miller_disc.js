@@ -16,9 +16,9 @@ let methodTrack = 1; // track method used (FP, MR, MD)
 let clickBegin = 0;
 let completeSound;
 
-/*function preload() {
+function preload() {
   completeSound = loadSound('complete.mp3');
-}*/
+}
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -87,7 +87,7 @@ function draw() {
     rect(0, 0, wW, wH);
     noStroke();
     strokeWeight(1);
-    //completeSound.play();
+    completeSound.play();
   } else {
     // black border
     noFill();
