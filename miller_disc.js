@@ -582,9 +582,9 @@ function mouseDragged() {
     //                         0.8, 1);
     adjustMax = wH * 2/3; //(resizeArea[3] - resizeArea[1]) * 3;
     if(mouseY > pmouseY) {
-      buttonResizeFactor = min(1, buttonResizeFactor += 0.01);
+      buttonResizeFactor = min(1, buttonResizeFactor += 0.05);
     } else {
-      buttonResizeFactor = max(0.7, buttonResizeFactor -= 0.01);
+      buttonResizeFactor = max(0.7, buttonResizeFactor -= 0.05);
     }
     updateUI();
     console.log('resize' + mouseY);
