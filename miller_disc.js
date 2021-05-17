@@ -327,7 +327,6 @@ function mouseClicked() {
   if(clickBegin === 0) {
     clickBegin = 1;
     device = 'mouse';
-    device = 'touch';
   } else {
     if(mouseX > resetArea[0] & mouseY > resetArea[1] &
         mouseX < resetArea[2] & mouseY < resetArea[3]) {
@@ -349,10 +348,6 @@ function mouseClicked() {
         mouseX < negativeArea[2] & mouseY < negativeArea[3]) {
         negativeCount();
       }
-    if(mouseX > resizeArea[0] & mouseY > resizeArea[1] &
-        mouseX < resizeArea[2] & mouseY < resizeArea[3]) {
-       //resizeButtons();
-       }
   }
   updateUI();
 }
