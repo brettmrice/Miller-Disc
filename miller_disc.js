@@ -25,7 +25,7 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   wW = windowWidth;
   wH = windowHeight;
-  //completeSound = loadSound('complete.mp3');
+  completeSound = loadSound('https://brettmrice.com/Miller-Disc/complete.mp3');
 
   // arrays for positions
   for (let x = 0; x < 10; x++) {
@@ -595,7 +595,7 @@ function drawBorder() {
     rect(0, 0, wW, wH);
     noStroke();
     strokeWeight(1);
-    //completeSound.play();
+    completeSound.play();
   } else {
     // black border
     noFill();
