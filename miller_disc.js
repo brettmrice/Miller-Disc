@@ -100,7 +100,7 @@ function keyTyped() {
     positiveCount();
   }
   // delete previous entry
-  if (key === 'D' | key === 'd') {
+  if (numCells > 0 & (key === 'D' | key === 'd')) {
     deleteCount()
   }
   // reset count
