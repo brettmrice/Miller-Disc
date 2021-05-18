@@ -87,6 +87,10 @@ function draw() {
 }
 
 function keyTyped() {
+  // return nothing if not clicked first
+  if(clickBegin === 0) {
+    return false;
+  }
   // 2 = negative
   if (key === '2') {
     negativeCount();
@@ -327,7 +331,7 @@ function mouseClicked() {
   if(clickBegin === 0) {
     clickBegin = 1;
     device = 'mouse';
-  } else {
+  } /*else {
     if(mouseX > resetArea[0] & mouseY > resetArea[1] &
         mouseX < resetArea[2] & mouseY < resetArea[3]) {
         resetCount();
@@ -348,7 +352,7 @@ function mouseClicked() {
         mouseX < negativeArea[2] & mouseY < negativeArea[3]) {
         negativeCount();
       }
-  }
+  }*/
   updateUI();
 }
 
@@ -595,6 +599,8 @@ function drawBorder() {
     rect(0, 0, wW, wH);
     noStroke();
     strokeWeight(1);
+    soundLevel = pow((10 - ((numCells - 2) % 10))/10, 3);
+    completeSound.setVolume(0.4*soundLevel);
     completeSound.play();
   } else {
     // black border
