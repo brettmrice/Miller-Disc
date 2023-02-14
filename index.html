@@ -1,16 +1,157 @@
 <!DOCTYPE html>
 <head>
+  <meta charset="UTF-8">
   <title>Miller Disc</title>
-  <script src="https://brettmrice.com/Miller-Disc/p5.min.js"></script>
-  <script src="https://brettmrice.com/Miller-Disc/p5.sound.js"></script>
-  <!-- uncomment lines below to include extra p5 libraries -->
-  <!--<script src="../addons/p5.sound.js"></script>-->
-  <script src="miller_disc.js"></script>
-  <!-- this line removes any default padding and style. you might only need one of these values set. -->
-  <style> html, body {padding: 0; margin: 0; height: 100%; overflow: hidden;} </style>
+  <script src="p5.min.js"></script>
+  <script src="miller_disc.js" defer></script>
+  <style> 
+    html, body {
+      padding: 0; 
+      margin: 0; 
+      height: 100%; 
+      overflow: hidden;
+    }
+    #miller_disc {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    #patient_id {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(128,128,128, 0.5);
+    }
+    #id_input {
+      position: absolute;
+      background: rgba(255, 255, 255, 1.0);
+      max-width: 300px;
+      max-height: 200px;
+      top: calc(50% - 100px);
+      left: calc(50% - 150px);
+      margin: auto;
+      padding: 30px;
+      border-radius: 5px;
+    }
+    label{
+      display: inline-block;
+      float: left;
+      clear: left;
+      width: 80px;
+      text-align: right;
+    }
+    input {
+      display: inline-block;
+      float: left;
+    }
+    @media print {
+      html, body {
+        max-width: 600px;
+        max-height: calc(600px * 1.414);
+        /*width: 300px;
+        height: 300px; calc(600px * 1.414);*/
+        margin: auto;
+      }
+      #section-to-print {
+        position: absolute;
+        left: 0;
+        top: 0;
+        padding-bottom: 200px;
+        padding-left: 50px;
+        margin: auto;
+      }
+      #miller_disc {
+        display: block;
+        background: black;
+        top: 250px;
+        left: calc(50% - 300px);
+        max-width: 600px;
+        max-height: 600px;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      }
+    }
+  </style>
 </head>
 
 <body>
+  
+  <div id="section-to-print">
+    <h1>Accession:&nbsp;<span id="accession"></span></h1>
+    <h1>MRN:&nbsp;<span id="mrn"></span></h1>
+    <h1>Performed:&nbsp;<span id="performed"></span></h1>
+  </div>
+  
+  <div id="miller_disc"></div>
+  
+  <div id="patient_id" onclick="in_focus(event);" onkeypress="in_focus(event);">
+    <div id="id_input" onclick="in_focus(event);" onkeypress="in_focus(event);">
+       <form id="id_info">
+          <label for="accession">Accession:</label>
+          <input type="text" name="id_acc"><br><br>
+          <label for="mrn">MRN:</label>
+          <input type="text" name="id_mrn"><br><br>
+          <label for="performed">Performed:</label>
+          <input type="text" name="id_per"><br><br><br>
+          <input type="button" value="Print" onclick="add_info(event);close_patient_info();print();" style="float:right;">
+          <input type="button" value="Cancel" onclick="close_patient_info();" style="float:right;margin-right:5px;">
+        </form> 
+    </div>
+  </div>
+  
+<script>
+  function in_focus(e) {
+    add_info();
+    e.stopPropagation();
+  }
+  function add_info() {
+    patient_acc = document.getElementById("id_info").elements.id_acc.value;
+    patient_mrn = document.getElementById("id_info").elements.id_mrn.value;
+    patient_per = document.getElementById("id_info").elements.id_per.value;
+    
+    document.getElementById("accession").innerHTML = patient_acc;
+    document.getElementById("mrn").innerHTML = patient_mrn;
+    document.getElementById("performed").innerHTML = patient_per;
+  }
+  function close_patient_info() {
+    document.getElementById("patient_id").style.display = "none";
+    //print();
+  }
+  function open_patient_info() {
+    document.getElementById("patient_id").style.display = "block";
+  }
+  window.onbeforeprint = (event) => {
+    print_action = "yes";
+    
+    wW_bak = wW;
+    wW = 600;
+    wH_bak = wH;
+    wH = 600;
+    
+    resizeCanvas(wW, wH);
+    yStart  = wH*0.25;
+    xSize = floor((wW)/10);
+    ySize = floor((wH*0.5)/12);
+    textWidthTarget = (wW - 60) * 0.8;
+  };
+  
+  window.onafterprint = (event) => {
+    print_action = "no";
+    
+    wW = wW_bak;
+    wH = wH_bak;
+    
+    resizeCanvas(wW, wH);
+    yStart  = wH*0.25;
+    xSize = floor((wW)/10);
+    ySize = floor((wH*0.5)/12);
+    textWidthTarget = (wW - 60) * 0.8;
+  };
+</script>
 
 </body>
 </html>

@@ -1,5 +1,5 @@
 let cellColor = 255;
-let cell = " ";
+let cell = "";
 let arrayLength = 0;
 let xPos = [];
 let yPos = [];
@@ -16,16 +16,25 @@ let methodTrack = 1; // track method used (FP, MR, MD)
 let clickBegin = 0;
 let completeSound;
 let buttonResizeFactor = 1;
+let print_action = "no";
+let screen_capture_indicator = "no";
+image_reader = new FileReader();
+let div_size = document.getElementById("miller_disc");
 
 /*function preload() {
   completeSound = loadSound('complete.mp3');
 }*/
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  /*md = createCanvas(windowWidth, windowHeight);
   wW = windowWidth;
-  wH = windowHeight;
-  completeSound = loadSound('https://brettmrice.com/Miller-Disc/complete.mp3');
+  wH = windowHeight;*/
+  md = createCanvas(div_size.offsetWidth, div_size.offsetHeight);
+  wW = div_size.offsetWidth;
+  wH = div_size.offsetHeight;
+  md.parent('miller_disc');
+  //completeSound = loadSound('https://brettmrice.com/Miller-Disc/complete.mp3');
+  //getAudioContext().suspend();
 
   // arrays for positions
   for (let x = 0; x < 10; x++) {
@@ -46,7 +55,13 @@ function setup() {
   //numCells_display = 'Begin Counting...';
   numCells_display = '';
   textScale = 1;
-  textAlign(CENTER, CENTER)
+  textAlign(CENTER, CENTER);
+  
+  // get sample accession ID
+  //let acc = createInput('Accession: ');
+  //acc.position(wW/3, wH*0.95);
+  //acc.size(200);
+  //acc.style('visibility:hidden');
 }
 
 function draw() {
@@ -74,7 +89,7 @@ function draw() {
     clickBeginDisplay();
   } else {
     updateUI();
-    //displayCount();
+    displayCount();
   }
   if(numCells > 0) {
     displayCount(DisplayCountHeight);
@@ -82,6 +97,7 @@ function draw() {
 
   // complete signal = green border and audio
   drawBorder();
+  
 
   noLoop();
 }
@@ -101,7 +117,7 @@ function keyTyped() {
   }
   // delete previous entry
   if (numCells > 0 & (key === 'D' | key === 'd')) {
-    deleteCount()
+    deleteCount();
   }
   // reset count
   if (key === 'r' | key === 'R' |
@@ -111,6 +127,10 @@ function keyTyped() {
   // switch procedure - FP to MR to MD
   if (key === 's' | key === 'S') {
     switchMethod();
+  }
+  // Print
+  if (key === 'p' | key === 'P') {
+    open_patient_info();
   }
 
   // uncomment to prevent any default behavior
@@ -168,13 +188,14 @@ function positiveCount() {
 }
 
 function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-  wW = windowWidth;
-  wH = windowHeight;
+  wW = div_size.offsetWidth;
+  wH = div_size.offsetHeight;
+  resizeCanvas(wW, wH);
   yStart  = wH*0.25;
   xSize = floor((wW)/10);
   ySize = floor((wH*0.5)/12);
   textWidthTarget = (wW - 60) * 0.8;
+  loop();
 }
 
 function displayCount(f_displayCountHeight) {
@@ -191,9 +212,10 @@ function displayCount(f_displayCountHeight) {
       } else {
         fill(255);
       }
-      rect(xSize * colCount,
-           ySize * rowCount,
-           xSize, ySize);
+      rect((xSize * colCount) + 1,
+           (ySize * rowCount) + 1,
+           xSize-2, ySize-2,
+           20);
       fill(255, 50);
       textSize(min(xSize, ySize));
       if(cellCounter < numCells) {
@@ -297,7 +319,7 @@ function updateProgress() {
     P_to_N = round(RBCs_P/(RBCs_N*9)*100, 1);
     P_to_N_display = P_to_N_display_method + P_to_N.toFixed(1) + "%";
   }
-  numCells_display = "Cells Counted = " + numCells;
+  numCells_display = "Cells Counted = " + numCells + " (" + (numCells*9) + ")";
 }
 
 // display instructions at beginning
@@ -328,6 +350,9 @@ function instructions(defineInstructions, textHeight) {
 }
 
 function mouseClicked() {
+  //if (getAudioContext().state !== 'running') {
+  //  getAudioContext().resume();
+  //}
   if(clickBegin === 0) {
     clickBegin = 1;
     device = 'mouse';
@@ -357,6 +382,9 @@ function mouseClicked() {
 }
 
 function touchStarted() {
+  //if (getAudioContext().state !== 'running') {
+  //  getAudioContext().resume();
+  //}
   /*var fs = fullscreen();
     if (!fs) {
       fullscreen(true);
@@ -402,7 +430,7 @@ function updateUI() {
     }
   if(device === 'mouse') {
     mouseEnvironment();
-    DisplayCountHeight = (ySize*14)/updateNumRows;
+    DisplayCountHeight = ((ySize*14)-1)/updateNumRows;
   } else if(device === 'touch') {
     beginYReset = (ySize*12)*buttonResizeFactor;
     beginYResize = beginYReset - ySize;
@@ -436,14 +464,6 @@ function clickBeginDisplay() {
   beginTextHeight = (wH*0.75 - sizeFactor)/2 + (((wH*0.75 - sizeFactor)/2) + sizeFactor*2/3)/2;
   text('Click to Begin', wW/2, beginTextHeight);//wH*0.75/2);
   translate(-xStart, -yStart);
-
-  // black border
-  noFill();
-  stroke(0);
-  strokeWeight(30);
-  rect(0, 0, wW, wH);
-  noStroke();
-  strokeWeight(1);
 }
 
 function mouseEnvironment() {
@@ -476,7 +496,7 @@ function mouseEnvironment() {
   fill(0);
   noStroke();
   textSize(wH*0.04*textScale);
-  text('"R"eset       "D"elete       "S"witch', wW/2, wH*0.9);
+  text('"R"eset | "D"elete | "S"witch | "P"atient', wW/2, wH*0.9);
 }
 
 function touchEnvironment() {
@@ -592,22 +612,28 @@ function mouseDragged() {
 }
 
 function drawBorder() {
-  if(numCells >= 112) {
+  if(numCells >= 112 & print_action === "no") {
     noFill();
     stroke('rgb(0,255,0)');
     strokeWeight(50);
-    rect(0, 0, wW, wH);
+    rectMode(CENTER);
+    rect(wW/2, wH/2, wW, wH);
+    rectMode(CORNER);
+    //rect(0, 0, wW, wH);
     noStroke();
     strokeWeight(1);
-    soundLevel = pow((10 - ((numCells - 2) % 10))/10, 3);
-    completeSound.setVolume(0.4*soundLevel);
-    completeSound.play();
-  } else {
+    //soundLevel = pow((10 - ((numCells - 2) % 10))/10, 3);
+    //completeSound.setVolume(0.4*soundLevel);
+    //completeSound.play();
+  } else if(print_action === "no") {
     // black border
     noFill();
-    stroke(0);
-    strokeWeight(30);
-    rect(0, 0, wW, wH);
+    stroke('rgb(165, 172, 175)');
+    strokeWeight(4);
+    rectMode(CENTER);
+    rect(wW/2, wH/2, wW, wH);
+    rectMode(CORNER);
+    //rect(0, 0, wW, wH);
     noStroke();
     strokeWeight(1);
   }
