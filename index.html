@@ -39,6 +39,9 @@
       padding: 30px;
       border-radius: 5px;
     }
+    #section-to-print {
+      display: none;
+    }
     label{
       display: inline-block;
       float: left;
@@ -59,6 +62,7 @@
         margin: auto;
       }
       #section-to-print {
+        display: block;
         position: absolute;
         left: 0;
         top: 0;
@@ -93,14 +97,14 @@
     <div id="id_input" onclick="in_focus(event);" onkeypress="in_focus(event);">
        <form id="id_info">
           <label for="accession">Accession:</label>
-          <input type="text" name="id_acc"><br><br>
+            <input type="text" name="id_acc"><br><br>
           <label for="mrn">MRN:</label>
-          <input type="text" name="id_mrn"><br><br>
+            <input type="text" name="id_mrn"><br><br>
           <label for="performed">Performed:</label>
-          <input type="text" name="id_per"><br><br><br>
+            <input type="text" name="id_per"><br><br><br>
           <input type="button" value="Print" onclick="add_info(event);close_patient_info();print();" style="float:right;">
           <input type="button" value="Cancel" onclick="close_patient_info();" style="float:right;margin-right:5px;">
-        </form> 
+      </form> 
     </div>
   </div>
   
@@ -138,6 +142,7 @@
     xSize = floor((wW)/10);
     ySize = floor((wH*0.5)/12);
     textWidthTarget = (wW - 60) * 0.8;
+    console.log(wW, wH, yStart, ySize);
   };
   
   window.onafterprint = (event) => {

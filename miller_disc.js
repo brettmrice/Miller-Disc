@@ -13,7 +13,9 @@ let RBCs_P = 0; // fetal/postive RBCs
 let P_to_N = 0; // percent positive
 let countReset = "N";
 let methodTrack = 1; // track method used (FP, MR, MD)
-let clickBegin = 0;
+let clickBegin = 1;
+let device = 'mouse';
+let mouse_present = 'no';
 let completeSound;
 let buttonResizeFactor = 1;
 let print_action = "no";
@@ -65,6 +67,11 @@ function setup() {
 }
 
 function draw() {
+  xStart = 0;
+  yStart  = wH*0.25;
+  xSize = floor((wW)/10);
+  ySize = floor((wH*0.5)/12);
+  //console.log(device, '\t', mouse_present);
   background(255);
   updateMethod(methodTrack);
   updateTextScale();
@@ -99,7 +106,7 @@ function draw() {
   drawBorder();
   
 
-  noLoop();
+  //noLoop();
 }
 
 function keyTyped() {
@@ -389,11 +396,12 @@ function touchStarted() {
     if (!fs) {
       fullscreen(true);
     }*/
-  console.log('touching');
-  if(clickBegin === 0) {
-    clickBegin = 1;
+  //console.log('touching');
+  if(mouse_present === 'no') {
+  //if(clickBegin === 0) {
+    //clickBegin = 1;
     device = 'touch';
-  } else {
+  //} else {
     if(mouseX > resetArea[0] & mouseY > resetArea[1] &
         mouseX < resetArea[2] & mouseY < resetArea[3]) {
         resetCount();
@@ -416,6 +424,25 @@ function touchStarted() {
       }
   }
   updateUI();
+}
+
+function mouseMoved() {
+  if(device === 'touch') {
+    return false;
+  } else {
+    //console.log('touchMoved');
+    device = 'mouse';
+    mouse_present = 'yes';
+  }
+}
+function touchMoved() {
+  if(device === 'mouse') {
+    return false;
+  } else {
+    //console.log('touchMoved');
+    device = 'touch';
+    mouse_present = 'no';
+  }
 }
 /*
 document.ontouchmove = function(event) {
@@ -496,7 +523,7 @@ function mouseEnvironment() {
   fill(0);
   noStroke();
   textSize(wH*0.04*textScale);
-  text('"R"eset | "D"elete | "S"witch | "P"atient', wW/2, wH*0.9);
+  text('"R"eset | "D"elete | "S"witch | "P"rint', wW/2, wH*0.9);
 }
 
 function touchEnvironment() {
@@ -593,22 +620,24 @@ function touchEnvironment() {
 }
 
 function mouseDragged() {
-  if(clickBegin > 0 & 
-     mouseX > resizeArea[0] & mouseY > resizeArea[1] &
-        mouseX < resizeArea[2] & mouseY < resizeArea[3]) {
-    //buttonResizeFactor = map(mouseY, 
-    //                         beginYReset*.8, beginYReset,
-    //                         0.8, 1);
-    adjustMax = wH * 2/3; //(resizeArea[3] - resizeArea[1]) * 3;
-    if(mouseY > pmouseY) {
-      buttonResizeFactor = min(1, buttonResizeFactor += 0.05);
-    } else {
-      buttonResizeFactor = max(0.7, buttonResizeFactor -= 0.05);
-    }
-    updateUI();
-    console.log('resize' + mouseY);
+  if(device === 'touch') {
+    if(clickBegin > 0 & 
+         mouseX > resizeArea[0] & mouseY > resizeArea[1] &
+            mouseX < resizeArea[2] & mouseY < resizeArea[3]) {
+        //buttonResizeFactor = map(mouseY, 
+        //                         beginYReset*.8, beginYReset,
+        //                         0.8, 1);
+        adjustMax = wH * 2/3; //(resizeArea[3] - resizeArea[1]) * 3;
+        if(mouseY > pmouseY) {
+          buttonResizeFactor = min(1, buttonResizeFactor += 0.05);
+        } else {
+          buttonResizeFactor = max(0.7, buttonResizeFactor -= 0.05);
+        }
+        updateUI();
+        //console.log('resize' + mouseY);
+      }
+      return false;
   }
-  return false;
 }
 
 function drawBorder() {
